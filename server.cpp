@@ -141,7 +141,7 @@ int main(int argc, char const *argv[]) {
         {
           std::lock_guard<std::mutex> l(printMtx);
           std::cout << "["  << clientSocket
-                    << "] Received from client: " << buffer << std::endl;
+                    << "] Received from client." << std::endl;
           std::cout << "["  << clientSocket
                     << "] Replying to client." << std::endl;
         }
