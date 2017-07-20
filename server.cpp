@@ -74,6 +74,10 @@ int main(int argc, char const *argv[]) {
     perror("Error: ");
     return -1;
   }
+  setsockopt(serverSocket, SOL_SOCKET, SO_RCVBUF,
+             &messageSize, sizeof(messageSize));
+  setsockopt(serverSocket, SOL_SOCKET, SO_SNDBUF,
+             &messageSize, sizeof(messageSize));
 #ifdef DEBUG
   {
     std::lock_guard<std::mutex> l(printMtx);

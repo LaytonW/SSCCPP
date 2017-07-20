@@ -63,6 +63,10 @@ int main(int argc, char const *argv[]) {
         perror("Error: ");
         exit(-1);
       }
+      setsockopt(serverSocket, SOL_SOCKET, SO_RCVBUF,
+                 &messageSize, sizeof(messageSize));
+      setsockopt(serverSocket, SOL_SOCKET, SO_SNDBUF,
+                 &messageSize, sizeof(messageSize));
       std::unique_ptr<char> data(new char[messageSize]);
       memset(data.get(), '0', messageSize);
       std::unique_ptr<char> buffer(new char[REPLY_LEN + 1]);
