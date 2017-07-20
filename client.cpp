@@ -12,7 +12,7 @@
 
 #include "XNRW/include/ThreadPool.h"
 
-#define REPLY_LEN 3
+#define REPLY_LEN 2
 // #define DEBUG
 #define TIME
 

@@ -12,7 +12,7 @@
 
 #include "XNRW/include/ThreadPool.h"
 
-#define REPLY_LEN 3
+#define REPLY_LEN 2
 // #define DEBUG
 
 #ifdef DEBUG
@@ -122,7 +122,7 @@ int main(int argc, char const *argv[]) {
       memset(buffer.get(), 0, messageSize + 1);
       std::unique_ptr<char> reply(new char[REPLY_LEN + 1]);
       memset(reply.get(), 0, REPLY_LEN + 1);
-      strcpy(reply.get(), "ACK");
+      strcpy(reply.get(), "OK");
 #ifdef DEBUG
       {
         std::lock_guard<std::mutex> l(printMtx);
