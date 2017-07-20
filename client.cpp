@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cstddef>
 #include <unistd.h>
+#include <cerrno>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -48,7 +49,7 @@ int main(int argc, char const *argv[]) {
 
   XNRW::ThreadPool threadPool(numConn);
 
-  for (auto i = 0; i < numConn; i++) {
+  for (auto i = 0ull; i < numConn; i++) {
     threadPool.addTask([port, numMessage, messageSize, i]() {
       int serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
       struct sockaddr_in serverAddress;
@@ -59,21 +60,30 @@ int main(int argc, char const *argv[]) {
       if (connect(serverSocket, (struct sockaddr *)&serverAddress,
               sizeof(serverAddress)) < 0) {
         std::cerr << "Connection failed." << std::endl;
+        perror("Error: ");
         exit(-1);
       }
-      std::shared_ptr<char> data(new char[messageSize],
-                                 std::default_delete<char[]>());
+      std::unique_ptr<char> data(new char[messageSize]);
       memset(data.get(), '0', messageSize);
-      std::shared_ptr<char> buffer(new char[REPLY_LEN + 1],
-                                   std::default_delete<char[]>());
+      std::unique_ptr<char> buffer(new char[REPLY_LEN + 1]);
       memset(buffer.get(), 0, REPLY_LEN + 1);
-      for (auto j = 0; j < numMessage; j++) {
+      for (auto j = 0ull; j < numMessage; j++) {
 #ifdef TIME
         std::chrono::time_point<std::chrono::system_clock> start, end;
         start = std::chrono::system_clock::now();
 #endif
-        write(serverSocket, data.get(), messageSize);
-        read(serverSocket, buffer.get(), REPLY_LEN);
+        if (send(serverSocket, data.get(), messageSize, 0) < 0) {
+          std::cerr << "Send failed in connection " << i
+                    << " message " << j << std::endl;
+          perror("Error: ");
+          exit(-1);
+        }
+        if (recv(serverSocket, buffer.get(), REPLY_LEN, MSG_WAITALL) < 0) {
+          std::cerr << "Recv failed in connection " << i
+                    << " message " << j << std::endl;
+          perror("Error: ");
+          exit(-1);
+        }
 #ifdef TIME
         end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end - start;
@@ -94,8 +104,6 @@ int main(int argc, char const *argv[]) {
         }
 #endif
       }
-
-
       close(serverSocket);
     });
   }

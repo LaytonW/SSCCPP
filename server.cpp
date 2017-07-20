@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstddef>
+#include <cerrno>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -70,6 +71,7 @@ int main(int argc, char const *argv[]) {
   if (bind(serverSocket, (struct sockaddr *)&serverAddress,
            sizeof(serverAddress)) < 0) {
     std::cerr << "Bind socket failed." << std::endl;
+    perror("Error: ");
     return -1;
   }
 #ifdef DEBUG
@@ -87,7 +89,7 @@ int main(int argc, char const *argv[]) {
   }
 #endif
 
-  for (auto i = 0; i < numConn; i++) {
+  for (auto i = 0ull; i < numConn; i++) {
     socklen_t clientLen = sizeof(clientAddress);
 #ifdef DEBUG
     {
@@ -104,7 +106,7 @@ int main(int argc, char const *argv[]) {
       std::cout << "Adding task to thread pool." << std::endl;
     }
 #endif
-    threadPool.addTask([clientSocket, numMessage, messageSize]() {
+    threadPool.addTask([clientSocket, numMessage, messageSize, i]() {
 #ifdef DEBUG
     {
       std::lock_guard<std::mutex> l(printMtx);
@@ -112,11 +114,9 @@ int main(int argc, char const *argv[]) {
                 << clientSocket << std::endl;
     }
 #endif
-      std::shared_ptr<char> buffer(new char[messageSize + 1],
-                                   std::default_delete<char[]>());
+      std::unique_ptr<char> buffer(new char[messageSize + 1]);
       memset(buffer.get(), 0, messageSize + 1);
-      std::shared_ptr<char> reply(new char[REPLY_LEN + 1],
-                                  std::default_delete<char[]>());
+      std::unique_ptr<char> reply(new char[REPLY_LEN + 1]);
       memset(reply.get(), 0, REPLY_LEN + 1);
       strcpy(reply.get(), "ACK");
 #ifdef DEBUG
@@ -126,8 +126,13 @@ int main(int argc, char const *argv[]) {
                   << "] Reading from client..." << std::endl;
       }
 #endif
-      for (auto j = 0; j < numMessage; j++) {
-        read(clientSocket, buffer.get(), messageSize);
+      for (auto j = 0ull; j < numMessage; j++) {
+        if (recv(clientSocket, buffer.get(), messageSize, MSG_WAITALL) < 0) {
+          std::cerr << "Recv failed in connection " << i
+                    << " message " << j << std::endl;
+          perror("Error: ");
+          exit(-1);
+        }
 #ifdef DEBUG
         {
           std::lock_guard<std::mutex> l(printMtx);
@@ -137,15 +142,20 @@ int main(int argc, char const *argv[]) {
                     << "] Replying to client." << std::endl;
         }
 #endif
-        write(clientSocket, reply.get(), REPLY_LEN);
-#ifdef DEBUG
-        {
-          std::lock_guard<std::mutex> l(printMtx);
-          std::cout << "["  << clientSocket
-                    << "] Closing connection." << std::endl;
+        if (send(clientSocket, reply.get(), REPLY_LEN, 0) < 0) {
+          std::cerr << "Send failed in connection " << i
+                    << " message " << j << std::endl;
+          perror("Error: ");
+          exit(-1);
         }
-#endif
       }
+#ifdef DEBUG
+      {
+        std::lock_guard<std::mutex> l(printMtx);
+        std::cout << "["  << clientSocket
+                  << "] Closing connection." << std::endl;
+      }
+#endif
       close(clientSocket);
 #ifdef DEBUG
       {
