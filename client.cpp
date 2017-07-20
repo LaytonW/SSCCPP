@@ -24,6 +24,7 @@ std::mutex printMtx;
 #include <chrono>
 std::chrono::time_point<std::chrono::system_clock> start, end;
 long double totalLatency;
+std::mutex totalLatencyMutex;
 #endif
 
 int main(int argc, char const *argv[]) {
@@ -77,10 +78,7 @@ int main(int argc, char const *argv[]) {
         end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end - start;
         {
-          std::lock_guard<std::mutex> l(printMtx);
-          std::cout << "Connection " << i << ", message " << j
-                    <<  " finished. Took: " << std::fixed
-                    << elapsed_seconds.count() << "s" << std::endl;
+          std::lock_guard<std::mutex> l(totalLatencyMutex);
           totalLatency += elapsed_seconds.count();
         }
 #endif
@@ -88,6 +86,9 @@ int main(int argc, char const *argv[]) {
         {
           std::lock_guard<std::mutex> l(printMtx);
           std::cout << "Received from server: " << buffer << std::endl;
+          std::cout << "Connection " << i << ", message " << j
+                    <<  " finished. Took: " << std::fixed
+                    << elapsed_seconds.count() << "s" << std::endl;
         }
 #endif
       }
