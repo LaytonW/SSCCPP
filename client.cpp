@@ -86,9 +86,11 @@ int main(int argc, char const *argv[]) {
         {
           std::lock_guard<std::mutex> l(printMtx);
           std::cout << "Received from server: " << buffer << std::endl;
+#ifdef TIME
           std::cout << "Connection " << i << ", message " << j
                     <<  " finished. Took: " << std::fixed
                     << elapsed_seconds.count() << "s" << std::endl;
+#endif
         }
 #endif
       }
