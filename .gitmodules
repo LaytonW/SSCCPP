@@ -1,0 +1,3 @@
+[submodule "XNRW"]
+	path = XNRW
+	url = git@github.com:LaytonW/XNRW.git
