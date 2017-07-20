@@ -114,8 +114,8 @@ int main(int argc, char const *argv[]) {
               << "s/message" << std::endl;
     std::cout << "Average bandwidth: " << std::fixed
               << static_cast<long double>(
-                numConn * numMessage * messageSize * 1024 * 1024
-              ) / totalLatency << "MB/s" << std::endl;
+                numConn * numMessage * messageSize
+              ) / (totalLatency * 1024.0l * 1024.0l) << "MB/s" << std::endl;
   }
 #endif
 
