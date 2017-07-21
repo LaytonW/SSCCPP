@@ -12,5 +12,3 @@ or
 git clone --recursive https://github.com:LaytonW/SSCCPP.git
 ```
 to correctly load submodules.
-
-Run ```./mk``` or ```sh mk``` to build this project.
