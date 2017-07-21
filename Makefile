@@ -1,4 +1,4 @@
-.PHONY : clean all server client
+.PHONY : clean all server client test
 
 BINDIR := bin
 OBJDIR := obj
@@ -19,6 +19,13 @@ CLIENT_OBJ := $(OBJDIR)/client.o
 XNRW_ThreadPool := $(XNRWOBJDIR)/ThreadPool.o
 
 CXXFLAGS := --std=c++11 -O3 -D NDEBUG -lpthread -I$(LIBDIR)
+
+TEST_PORT := 1234
+TEST_NUM_THREADS := 8
+TEST_NUM_MESSAGE := 100
+TEST_MESSAGE_SIZE := 16777216
+
+TEST_PARAMS := $(TEST_PORT) $(TEST_NUM_THREADS) $(TEST_NUM_MESSAGES) $(TEST_MESSAGE_SIZE)
 
 all : server client
 
@@ -41,6 +48,9 @@ $(OBJDIR) :
 
 $(OBJECTS) : $(OBJDIR)/%.o : $(SRCDIR)/%.cpp | $(OBJDIR)
 	$(CXX) -c -o $@ $^ $(CXXFLAGS)
+
+test : all
+	$(SERVER) $(TEST_PARAMS) &; sleep 5; $(CLIENT) $(TEST_PARAMS)
 
 clean :
 	$(RM) $(OBJECTS) $(SERVER) $(CLIENT)
