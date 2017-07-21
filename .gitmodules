@@ -1,0 +1,4 @@
+[submodule "lib/XNRW"]
+	path = lib/XNRW
+	url = https://github.com/LaytonW/XNRW.git
+	branch = master
