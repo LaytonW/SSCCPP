@@ -23,7 +23,6 @@ std::mutex printMtx;
 #ifdef TIME
 #include <iomanip>
 #include <chrono>
-std::chrono::time_point<std::chrono::system_clock> start, end;
 long double totalLatency;
 std::mutex totalLatencyMutex;
 #endif
