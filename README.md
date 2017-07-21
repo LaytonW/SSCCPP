@@ -1,7 +1,7 @@
 # SSCCPP
-[![Build Status](https://travis-ci.org/LaytonW/SSCCPP.svg?branch=master)](https://travis-ci.org/LaytonW/SSCCPP)
-
 Simple Server-Client in CPP
+
+[![Build Status](https://travis-ci.org/LaytonW/SSCCPP.svg?branch=master)](https://travis-ci.org/LaytonW/SSCCPP)
 
 https://github.com/LaytonW/SSCCPP
 
