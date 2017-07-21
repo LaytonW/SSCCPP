@@ -4,7 +4,8 @@ BINDIR := bin
 OBJDIR := obj
 SRCDIR := src
 LIBDIR := lib
-XNRWOBJDIR := $(LIBDIR)/XNRW/obj
+XNRWDIR := $(LIBDIR)/XNRW
+XNRWOBJDIR := $(XNRWDIR)/obj
 SOURCES := $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 
