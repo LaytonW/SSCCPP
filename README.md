@@ -12,6 +12,6 @@ git clone --recursive git@github.com:LaytonW/SSCCPP.git
 ```
 or
 ```
-git clone --recursive https://github.com:LaytonW/SSCCPP.git
+git clone --recursive https://github.com/LaytonW/SSCCPP.git
 ```
 to correctly load submodules.
