@@ -55,4 +55,4 @@ test : all
 	$(CLIENT) $(TEST_PARAMS)
 
 clean :
-	$(RM) $(OBJECTS) $(SERVER) $(CLIENT)
+	$(RM) -r $(OBJDIR) $(BINDIR)
